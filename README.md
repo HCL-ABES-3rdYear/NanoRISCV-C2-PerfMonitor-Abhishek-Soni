@@ -265,13 +265,11 @@ Cycles after clear  = 0 (expected 0)
 
 ### Waveforms
 
-> Add your screenshots to `docs/` and update the file names below.
-
-![Top-level waveform](docs/waveform_top.png)
+![Top-level waveform]
 
 *Core signals and monitor counters: `ex_valid` drops on every flush, `take_branch` pulses 5 times, and `cycle_cnt` / `instr_cnt` end at 29 / 23.*
 
-![PerfMonitor testbench waveform](docs/waveform_perfmonitor_tb.png)
+![PerfMonitor testbench waveform].
 
 *Standalone monitor testbench, with `test_id` showing the active test.*
 
@@ -304,9 +302,11 @@ vvp sim_pm
 ### Constraints (`timing.xdc`)
 
 ```tcl
+# Clock: 20 ns period (50 MHz)
 create_clock -period 20.000 -name clk [get_ports clk]
-set_input_delay  -clock clk 2.000 [get_ports {reset perf_enable perf_clear perf_sel[*]}]
-set_output_delay -clock clk 2.000 [get_ports {debug_out[*] perf_data[*] perf_overflow}]
+
+# Asynchronous reset is not timed synchronously
+set_false_path -from [get_ports reset]
 ```
 
 Pin locations (`PACKAGE_PIN`, `IOSTANDARD`) are not included yet; they are needed for a board build.
@@ -332,16 +332,26 @@ Measured on the core before the monitor was added, running the 8-instruction tes
 | I/O pins | 34 of 300 (11.33%) |
 | Total on-chip power | 0.084 W (0.002 W dynamic, 0.081 W device static) |
 
-### Core + PerfMonitor
+### Core + PerfMonitor (PYNQ-Z2 `xc7z020clg400-1`, Vivado, 20 ns clock)
 
-| Metric | Kintex-7 `xc7k70tfbv676-1` | PYNQ-Z2 `xc7z020clg400-1` |
-|---|---|---|
-| WNS / WHS | to be added | to be added |
-| LUTs / LUTRAM / FFs | to be added | to be added |
-| Power | to be added | to be added |
+Measured after integrating `PerfMonitor` into `NanoRISCV_C2` with all timing constraints met.
 
-The monitor is expected to add about 200 flip-flops (six 32-bit counters plus overflow flags) and a small amount of logic; the measured overhead will be filled in after implementation.
+| Metric | Value |
+|---|---|
+| Worst setup slack (WNS) | 7.362 ns (0 failing endpoints out of 2,267) |
+| Worst hold slack (WHS) | 0.036 ns (0 failing endpoints out of 2,267) |
+| Worst pulse-width slack (WPWS) | 8.750 ns (0 failing endpoints out of 448) |
+| Estimated max clock | about 79.1 MHz (1 / (20 ns − 7.362 ns)) |
+| Slice LUTs | 757 of 53,200 (1.42%) — 585 logic, 172 LUTRAM |
+| LUTRAM | 172 of 17,400 (0.99%) |
+| Flip-flops (Slice Registers) | 231 of 106,400 (0.22%) |
+| F7 / F8 Muxes | 64 / 32 |
+| I/O pins (Bonded IOB) | 72 of 125 (57.60%) |
+| BUFGCTRL | 1 of 32 (3.13%) |
+| Total on-chip power | 0.109 W (0.005 W dynamic, 0.104 W device static) |
+| Junction temperature | 26.3 °C (58.7 °C thermal margin) |
 
+**Measured `PerfMonitor` overhead:** `Perf_Inst` accounts for **333 LUTs** and **198 flip-flops** (six 32-bit counters + six sticky overflow flags) across 94 slices, keeping total chip utilization under 1.5%.
 ---
 
 ## Dataset
