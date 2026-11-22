@@ -44,7 +44,7 @@ The project was built in two parts:
 
 ## Architecture
 
-![NanoRISCV-C2 with PerfMonitor](docs/NanoRISCV_C2_PerfMonitor_Architecture.png)
+![NanoRISCV-C2 with PerfMonitor](architecture/NanoRISCV_C2_PerfMonitor_Architecture.png)
 
 **Reading the diagram**
 
@@ -61,10 +61,9 @@ The project was built in two parts:
 
 ## Repository structure
 
-> Adjust the paths below to match your repository.
 
 ```
-NANORISCV-C2/
+NanoRISCV-C2-PerfMonitor-Abhishek-Soni/
 ├── rtl/
 │   ├── NanoRISCV_C2.v        top level (core + monitor)
 │   ├── ProgramCounter.v
@@ -83,11 +82,7 @@ NANORISCV-C2/
 │   └── tb_PerfMonitor.v      standalone, self-checking monitor test
 ├── constraints/
 │   └── timing.xdc
-├── dataset/
-│   ├── dataset_5000.csv      instruction-trace dataset
-│   ├── data_dictionary.csv
-│   └── gen_traces.py         generator for the extra dataset rows
-├── docs/
+├── architecture/
 │   ├── NanoRISCV_C2_PerfMonitor_Architecture.png
 │   └── (waveforms, Vivado report screenshots)
 └── README.md
@@ -308,8 +303,6 @@ create_clock -period 20.000 -name clk [get_ports clk]
 # Asynchronous reset is not timed synchronously
 set_false_path -from [get_ports reset]
 ```
-
-Pin locations (`PACKAGE_PIN`, `IOSTANDARD`) are not included yet; they are needed for a board build.
 
 ---
 
